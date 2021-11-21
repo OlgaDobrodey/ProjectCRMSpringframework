@@ -6,13 +6,11 @@ import com.itrex.java.lab.projectcrmspringboot.repository.UserRepository;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-@Primary
+//@Primary
 @Repository
 public class HibernateUserRepositoryImpl implements UserRepository {
 
@@ -26,7 +24,6 @@ public class HibernateUserRepositoryImpl implements UserRepository {
     private SessionFactory sessionFactory;
 
     @Override
-//    @Transactional(rollbackFor = {CRMProjectRepositoryException.class})
     public List<User> selectAll() throws CRMProjectRepositoryException {
 
         try {
@@ -38,7 +35,6 @@ public class HibernateUserRepositoryImpl implements UserRepository {
     }
 
     @Override
-//    @Transactional(rollbackFor = {CRMProjectRepositoryException.class})
     public User selectById(Integer id) throws CRMProjectRepositoryException {
 
         try (Session session = sessionFactory.openSession()) {
@@ -50,10 +46,8 @@ public class HibernateUserRepositoryImpl implements UserRepository {
     }
 
     @Override
-//    @Transactional(rollbackFor = {CRMProjectRepositoryException.class})
     public List<User> selectAllUsersByTaskId(Integer taskId) throws CRMProjectRepositoryException {
-        try {
-            Session session = sessionFactory.getCurrentSession();
+        try (Session session = sessionFactory.openSession()) {
 
             return session.createQuery(SELECT_ALL_USERS_BY_TASK, User.class)
                     .setParameter(TASK_ID, taskId)
@@ -64,11 +58,8 @@ public class HibernateUserRepositoryImpl implements UserRepository {
     }
 
     @Override
-//    @Transactional(rollbackFor = {CRMProjectRepositoryException.class})
     public List<User> selectAllUsersByRoleId(Integer roleId) throws CRMProjectRepositoryException {
-        try {
-            Session session = sessionFactory.getCurrentSession();
-
+        try (Session session = sessionFactory.openSession()) {
             return session.createQuery(SELECT_ALL_USERS_BY_ROLE, User.class)
                     .setParameter(ROLE_ID, roleId)
                     .getResultList();
@@ -78,11 +69,9 @@ public class HibernateUserRepositoryImpl implements UserRepository {
     }
 
     @Override
-//    @Transactional(rollbackFor = {CRMProjectRepositoryException.class})
     public User add(User user) throws CRMProjectRepositoryException {
 
-        try {
-            Session session = sessionFactory.openSession();
+        try (Session session = sessionFactory.openSession()) {
             session.save(user);
             return user;
         } catch (Exception ex) {
@@ -91,7 +80,6 @@ public class HibernateUserRepositoryImpl implements UserRepository {
     }
 
     @Override
-//    @Transactional(rollbackFor = {CRMProjectRepositoryException.class})
     public User update(User user) throws CRMProjectRepositoryException {
 
         try (Session session = sessionFactory.openSession()) {
@@ -105,15 +93,13 @@ public class HibernateUserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    @Transactional(rollbackFor = {CRMProjectRepositoryException.class})
     public void remove(Integer userId) throws CRMProjectRepositoryException {
-        try {
-            Session session = sessionFactory.openSession();
-//            session.getTransaction().begin();
+
+        try (Session session = sessionFactory.openSession()) {
+            session.getTransaction().begin();
             User user = session.get(User.class, userId);
             session.remove(user);
-//            session.getTransaction().commit();
-//            session.close();
+            session.getTransaction().commit();
         } catch (Exception ex) {
             throw new CRMProjectRepositoryException("ERROR: REMOVE_USER - " + userId + ": ", ex);
         }

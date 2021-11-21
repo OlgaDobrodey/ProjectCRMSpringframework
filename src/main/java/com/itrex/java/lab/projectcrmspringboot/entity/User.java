@@ -38,7 +38,7 @@ public class User implements Serializable {
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
-            name = "user_task", schema = "CRM",
+            name = "user_task", schema = "PUBLIC",
             joinColumns = {@JoinColumn(name = "users_id")},
             inverseJoinColumns = {@JoinColumn(name = "tasks_id")}
     )

@@ -8,7 +8,6 @@ import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.Query;
 import java.util.List;
@@ -31,10 +30,8 @@ public class HibernateRoleRepositoryImpl implements RoleRepository {
     }
 
     @Override
-    @Transactional(rollbackFor = {CRMProjectRepositoryException.class})
     public List<Role> selectAll() throws CRMProjectRepositoryException {
-        try {
-            Session session = sessionFactory.getCurrentSession();
+        try (Session session = sessionFactory.openSession()) {
             return session.createQuery(SELECT_ALL, Role.class).list();
         } catch (Exception e) {
             throw new CRMProjectRepositoryException("ERROR: SELECT ALL ROLES: ", e);
@@ -42,21 +39,18 @@ public class HibernateRoleRepositoryImpl implements RoleRepository {
     }
 
     @Override
-    @Transactional(rollbackFor = {CRMProjectRepositoryException.class})
     public Role selectById(Integer id) throws CRMProjectRepositoryException {
-        try {
-            Session session = sessionFactory.openSession();
-            return session.get(Role.class, id);
+        try (Session session = sessionFactory.openSession()) {
+
+            return session.find(Role.class, id);
         } catch (Exception e) {
             throw new CRMProjectRepositoryException("ERROR: SELECT ROLE BY ID: ", e);
         }
     }
 
     @Override
-    @Transactional(rollbackFor = {CRMProjectRepositoryException.class})
     public Role add(Role role) throws CRMProjectRepositoryException {
-        try {
-            Session session = sessionFactory.getCurrentSession();
+        try (Session session = sessionFactory.openSession()) {
             session.save(role);
             return role;
         } catch (Exception ex) {
@@ -65,15 +59,15 @@ public class HibernateRoleRepositoryImpl implements RoleRepository {
     }
 
     @Override
-    @Transactional(rollbackFor = {CRMProjectRepositoryException.class})
     public Role update(Role role) throws CRMProjectRepositoryException {
-        try {
-            Session session = sessionFactory.getCurrentSession();
+        try (Session session = sessionFactory.openSession()) {
 
+            session.getTransaction().begin();
             Query query = session.createQuery(UPDATE);
             query.setParameter(ROLE_NAME, role.getRoleName());
             query.setParameter(ID_ROLE, role.getId());
             query.executeUpdate();
+            session.getTransaction().commit();
 
             return Optional.ofNullable(session.get(Role.class, role.getId())).orElseThrow(() -> new CRMProjectRepositoryException("ROLE NO FOUND DATA BASE"));
         } catch (Exception ex) {

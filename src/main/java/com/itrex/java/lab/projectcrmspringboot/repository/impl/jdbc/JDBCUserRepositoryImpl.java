@@ -6,6 +6,7 @@ import com.itrex.java.lab.projectcrmspringboot.repository.RoleRepository;
 import com.itrex.java.lab.projectcrmspringboot.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
@@ -13,6 +14,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+@Primary
 @Repository
 @Qualifier("JDBCUserRepository")
 @Deprecated
@@ -27,7 +29,7 @@ public class JDBCUserRepositoryImpl implements UserRepository {
     private static final String CROSS_TABLE_ID_USER = "users_id";
 
     private static final String SELECT_ALL_QUERY = "SELECT * FROM user";
-    private static final String SELECT_USER_BY_ID_QUERY = "SELECT * FROM user WHERE id = ";
+    private static final String SELECT_USER_BY_ID_QUERY = "SELECT * FROM user  WHERE id = ";
     private static final String SELECT_ALL_USERS_FOR_TASK = "SELECT users_id FROM user_task WHERE tasks_id = ";
     private static final String SELECT_ALL_USERS_BY_ROLE = "SELECT * FROM user WHERE role_id = ";
 
@@ -36,13 +38,10 @@ public class JDBCUserRepositoryImpl implements UserRepository {
     private static final String DELETE_USER_QUERY = "DELETE FROM user WHERE id = ?";
     private static final String DELETE_USER_ALL_TASKS_QUERY = "DELETE FROM user_task WHERE users_id = ?";
 
-    private DataSource dataSource;
-    private RoleRepository roleRepository;
-
     @Autowired
-    public JDBCUserRepositoryImpl(DataSource dataSource) {
-        this.dataSource = dataSource;
-    }
+    private DataSource dataSource;
+    @Autowired
+    private RoleRepository roleRepository;
 
     @Override
     public List<User> selectAll() throws CRMProjectRepositoryException {
@@ -83,6 +82,7 @@ public class JDBCUserRepositoryImpl implements UserRepository {
     public List<User> selectAllUsersByTaskId(Integer taskId) throws CRMProjectRepositoryException {
         List<User> users = new ArrayList<>();
         try (Connection conn = dataSource.getConnection();
+
              Statement stm = conn.createStatement();
              ResultSet resultSet = stm.executeQuery(SELECT_ALL_USERS_FOR_TASK + taskId)) {
             while (resultSet.next()) {
@@ -181,7 +181,6 @@ public class JDBCUserRepositoryImpl implements UserRepository {
         user.setId(resultSet.getInt(ID_USER_COLUMN));
         user.setLogin(resultSet.getString(LOGIN_USER_COLUMN));
         user.setPsw(resultSet.getString(PSW_USER_COLUMN));
-        roleRepository = new JDBCRoleRepositoryImpl(dataSource);
         user.setRole(roleRepository.selectById(resultSet.getInt(ROLE_USER_COLUMN)));
         user.setFirstName(resultSet.getString(FIRST_NAME_USER_COLUMN));
         user.setLastName(resultSet.getString(LAST_NAME_USER_COLUMN));

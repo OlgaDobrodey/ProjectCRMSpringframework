@@ -5,17 +5,17 @@ import com.itrex.java.lab.projectcrmspringboot.repository.TaskRepository;
 import com.itrex.java.lab.projectcrmspringboot.repository.UserRepository;
 import com.itrex.java.lab.projectcrmspringboot.service.TaskService;
 import com.itrex.java.lab.projectcrmspringboot.service.UserService;
-import org.flywaydb.core.Flyway;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 
+@Slf4j
 @SpringBootApplication
+@EnableAspectJAutoProxy(proxyTargetClass = true)
 public class ProjectCrmSpringBootApplication implements CommandLineRunner {
-
-    @Autowired
-    private Flyway flyway;
 
     @Autowired
     UserRepository userRepository;
@@ -33,26 +33,15 @@ public class ProjectCrmSpringBootApplication implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         System.out.println("===================START APP======================");
-//        flyway.clean();
-//        flyway.migrate();
-//        System.out.println(userService.getAll());
-//        User user = User.builder().login("112").psw("123").role(Role.builder().id(1).roleName("ADMIN").build())
-//                .firstName("").lastName("").build();
+//        System.out.println( userRepository.selectAll());
         User user1 = userRepository.selectById(1);
         user1.setPsw("123444");
         System.out.println(userRepository.update(user1));
         System.out.println(userRepository.selectAll());
-//        User user = User.builder().login("112").psw("123").role(Role.builder().id(1).roleName("ADMIN").build())
-//                .firstName("").lastName("").build();
-//        System.out.println(userRepository.add(user));
-//        System.out.println(userRepository.selectAll());
-//        userRepository.remove(1);
-//        System.out.println(userRepository.selectAll());
-//        userService.remove(1);
-//        System.out.println(userRepository.selectAll());
-//        flyway.clean();
+        log.info("log info");
+        log.debug("log debug");
+        log.error("log error");
 
-//        System.out.println(taskService.finishTaskByTaskId(2));
         System.out.println("=================SHUT DOWN APP====================");
     }
 

@@ -8,7 +8,6 @@ import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -29,10 +28,8 @@ public class HibernateTaskRepositoryImpl implements TaskRepository {
     }
 
     @Override
-    @Transactional(rollbackFor = {CRMProjectRepositoryException.class})
     public List<Task> selectAll() throws CRMProjectRepositoryException {
-        try {
-            Session session = sessionFactory.getCurrentSession();
+        try (Session session = sessionFactory.openSession()) {
             return session.createQuery(SELECT_ALL, Task.class).list();
         } catch (Exception ex) {
             throw new CRMProjectRepositoryException("ERROR: SELECT ALL TASK: " + ex);
@@ -40,10 +37,8 @@ public class HibernateTaskRepositoryImpl implements TaskRepository {
     }
 
     @Override
-    @Transactional(rollbackFor = {CRMProjectRepositoryException.class})
     public Task selectById(Integer id) throws CRMProjectRepositoryException {
-        try {
-            Session session = sessionFactory.getCurrentSession();
+        try (Session session = sessionFactory.openSession()) {
             return session.get(Task.class, id);
         } catch (Exception ex) {
             throw new CRMProjectRepositoryException("ERROR: SELECT TASK BY ID: " + ex);
@@ -51,10 +46,8 @@ public class HibernateTaskRepositoryImpl implements TaskRepository {
     }
 
     @Override
-    @Transactional(rollbackFor = {CRMProjectRepositoryException.class})
     public List<Task> selectAllTasksByUserId(Integer id) throws CRMProjectRepositoryException {
-        try {
-            Session session = sessionFactory.getCurrentSession();
+        try (Session session = sessionFactory.openSession()) {
 
             return session.createQuery(SELECT_ALL_TASKS_BY_USER, Task.class)
                     .setParameter(USER_ID, id)
@@ -65,10 +58,8 @@ public class HibernateTaskRepositoryImpl implements TaskRepository {
     }
 
     @Override
-    @Transactional(rollbackFor = {CRMProjectRepositoryException.class})
     public Task add(Task task) throws CRMProjectRepositoryException {
-        try {
-            Session session = sessionFactory.getCurrentSession();
+        try (Session session = sessionFactory.openSession()) {
             session.save(task);
         } catch (Exception ex) {
             throw new CRMProjectRepositoryException("ERROR: INSERT INTO TASK- " + task + ": ", ex);
@@ -77,11 +68,11 @@ public class HibernateTaskRepositoryImpl implements TaskRepository {
     }
 
     @Override
-    @Transactional(rollbackFor = {CRMProjectRepositoryException.class})
     public Task update(Task task) throws CRMProjectRepositoryException {
-        try {
-            Session session = sessionFactory.getCurrentSession();
+        try (Session session = sessionFactory.openSession()) {
+            session.getTransaction().begin();
             session.update(task);
+            session.getTransaction().commit();
             return session.get(Task.class, task.getId());
         } catch (Exception e) {
             throw new CRMProjectRepositoryException("ERROR: UPDATE TASK " + task, e);
@@ -89,13 +80,12 @@ public class HibernateTaskRepositoryImpl implements TaskRepository {
     }
 
     @Override
-    @Transactional(rollbackFor = {CRMProjectRepositoryException.class})
     public void remove(Integer taskId) throws CRMProjectRepositoryException {
-        try {
-            Session session = sessionFactory.getCurrentSession();
-
+        try (Session session = sessionFactory.openSession()) {
+            session.getTransaction().begin();
             Task task = session.get(Task.class, taskId);
             session.delete(task);
+            session.getTransaction().commit();
         } catch (Exception ex) {
             throw new CRMProjectRepositoryException("ERROR: REMOVE_TASK - " + taskId + ": ", ex);
         }
