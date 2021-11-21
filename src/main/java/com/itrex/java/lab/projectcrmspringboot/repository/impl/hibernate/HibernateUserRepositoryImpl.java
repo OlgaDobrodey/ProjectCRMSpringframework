@@ -6,17 +6,18 @@ import com.itrex.java.lab.projectcrmspringboot.repository.UserRepository;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-//@Primary
+@Primary
 @Repository
 public class HibernateUserRepositoryImpl implements UserRepository {
 
     private static final String TASK_ID = "taskId";
     private static final String ROLE_ID = "roleId";
-    private static final String SELECT_ALL = "from User u";
+    private static final String SELECT_ALL = "select u from User u";
     private static final String SELECT_ALL_USERS_BY_TASK = "select u from Task t join t.users u where t.id =:taskId";
     private static final String SELECT_ALL_USERS_BY_ROLE = "select u from Role r join r.users u where r.id =:roleId";
 

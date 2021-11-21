@@ -1,12 +1,11 @@
 package com.itrex.java.lab.projectcrmspringboot.repository.impl.jdbc;
 
+import com.itrex.java.lab.projectcrmspringboot.entity.Role;
 import com.itrex.java.lab.projectcrmspringboot.entity.User;
 import com.itrex.java.lab.projectcrmspringboot.exceptions.CRMProjectRepositoryException;
-import com.itrex.java.lab.projectcrmspringboot.repository.RoleRepository;
 import com.itrex.java.lab.projectcrmspringboot.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
@@ -14,34 +13,37 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-@Primary
 @Repository
 @Qualifier("JDBCUserRepository")
 @Deprecated
 public class JDBCUserRepositoryImpl implements UserRepository {
 
-    private static final String ID_USER_COLUMN = "id";
-    private static final String LOGIN_USER_COLUMN = "login";
-    private static final String PSW_USER_COLUMN = "psw";
-    private static final String ROLE_USER_COLUMN = "role_id";
-    private static final String FIRST_NAME_USER_COLUMN = "first_name";
-    private static final String LAST_NAME_USER_COLUMN = "last_name";
+    private static final String ID_USER_COLUMN = "user.id";
+    private static final String LOGIN_USER_COLUMN = "user.login";
+    private static final String PSW_USER_COLUMN = "user.psw";
+    private static final String ROLE_USER_COLUMN = "user.role_id";
+    private static final String ROLE_NAME_TABLE_ROLE = "role.role_name";
+    private static final String FIRST_NAME_USER_COLUMN = "user.first_name";
+    private static final String LAST_NAME_USER_COLUMN = "user.last_name";
     private static final String CROSS_TABLE_ID_USER = "users_id";
 
-    private static final String SELECT_ALL_QUERY = "SELECT * FROM user";
-    private static final String SELECT_USER_BY_ID_QUERY = "SELECT * FROM user  WHERE id = ";
+    private static final String SELECT_ALL_QUERY =
+            "SELECT user.id, user.login, user.psw, user.role_id, user.first_name, user.last_name, role.role_name " +
+                    "FROM user join role on role.id = user.role_id";
+    private static final String SELECT_USER_BY_ID_QUERY = SELECT_ALL_QUERY + " WHERE user.id = ";
     private static final String SELECT_ALL_USERS_FOR_TASK = "SELECT users_id FROM user_task WHERE tasks_id = ";
-    private static final String SELECT_ALL_USERS_BY_ROLE = "SELECT * FROM user WHERE role_id = ";
+    private static final String SELECT_ALL_USERS_BY_ROLE = SELECT_ALL_QUERY + " WHERE user.role_id = ";
 
-    private static final String INSERT_USER_QUERY = "INSERT INTO user(login, psw, role_id, first_name, last_name) VALUES (?, ?, ?, ?, ?)";
-    private static final String UPDATE_USER_QUERY = "UPDATE user SET login=?, psw=?, role_id=?, first_name=?, last_name=?  WHERE id = ?";
-    private static final String DELETE_USER_QUERY = "DELETE FROM user WHERE id = ?";
+    private static final String INSERT_USER_QUERY = "INSERT INTO user(login, psw, role_id, first_name, last_name)" +
+            " VALUES (?, ?, ?, ?, ?)";
+    private static final String UPDATE_USER_QUERY =
+            "UPDATE user SET user.login=?, user.psw=?, user.role_id=?, user.first_name=?, user.last_name=?" +
+                    "  WHERE user.id = ?";
+    private static final String DELETE_USER_QUERY = "DELETE FROM user WHERE user.id = ?";
     private static final String DELETE_USER_ALL_TASKS_QUERY = "DELETE FROM user_task WHERE users_id = ?";
 
     @Autowired
     private DataSource dataSource;
-    @Autowired
-    private RoleRepository roleRepository;
 
     @Override
     public List<User> selectAll() throws CRMProjectRepositoryException {
@@ -181,7 +183,8 @@ public class JDBCUserRepositoryImpl implements UserRepository {
         user.setId(resultSet.getInt(ID_USER_COLUMN));
         user.setLogin(resultSet.getString(LOGIN_USER_COLUMN));
         user.setPsw(resultSet.getString(PSW_USER_COLUMN));
-        user.setRole(roleRepository.selectById(resultSet.getInt(ROLE_USER_COLUMN)));
+        Role role = Role.builder().id(resultSet.getInt(ROLE_USER_COLUMN)).roleName(resultSet.getString(ROLE_NAME_TABLE_ROLE)).build();
+        user.setRole(role);
         user.setFirstName(resultSet.getString(FIRST_NAME_USER_COLUMN));
         user.setLastName(resultSet.getString(LAST_NAME_USER_COLUMN));
 

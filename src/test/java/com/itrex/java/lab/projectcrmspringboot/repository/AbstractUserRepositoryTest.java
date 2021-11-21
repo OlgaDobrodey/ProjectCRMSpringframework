@@ -145,17 +145,6 @@ public abstract class AbstractUserRepositoryTest extends BaseRepositoryTest {
     }
 
     @Test
-    void update_existIdUser_shouldThrowRepositoryExceptionTest() {
-        //given && when
-        cleanDB();    //clean Data Base
-        User expected = RepositoryTestUtils.createTestUsers(1).get(0);
-        Integer id = 1;
-
-        //then
-        assertThrows(CRMProjectRepositoryException.class, () -> repository.update(expected));
-    }
-
-    @Test
     void remove_validData_existUser_Test() throws CRMProjectRepositoryException {
         //given
         User user = repository.selectById(1);

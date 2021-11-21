@@ -33,11 +33,11 @@ public class ProjectCrmSpringBootApplication implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         System.out.println("===================START APP======================");
-//        System.out.println( userRepository.selectAll());
+        System.out.println( userService.getAll());
         User user1 = userRepository.selectById(1);
-        user1.setPsw("123444");
-        System.out.println(userRepository.update(user1));
-        System.out.println(userRepository.selectAll());
+        user1.setLogin("111111qwer");
+        System.out.println(userService.getAllUsersByTaskId(1));
+        System.out.println(userService.getAll());
         log.info("log info");
         log.debug("log debug");
         log.error("log error");
