@@ -59,7 +59,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserDTO> getAllUsersByTaskId(Integer taskId) throws CRMProjectServiceException {
+    public List<UserDTO> getAllTaskUsersByTaskId(Integer taskId) throws CRMProjectServiceException {
         try {
             Task task = taskRepository.selectById(taskId);
             if (task == null) {
@@ -75,7 +75,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public List<UserDTO> getAllUsersByRoleId(Integer roleId) throws CRMProjectServiceException {
+    public List<UserDTO> getAllRoleUsersByRoleId(Integer roleId) throws CRMProjectServiceException {
         try {
             Role role = roleRepository.selectById(roleId);
             if (role == null) {
@@ -161,8 +161,8 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    //    @Transactional
     @Override
+    @Transactional
     public void remove(Integer userId) throws CRMProjectServiceException {
         try {
             User user = userRepository.selectById(userId);

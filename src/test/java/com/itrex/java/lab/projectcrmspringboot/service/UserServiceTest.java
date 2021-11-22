@@ -122,7 +122,7 @@ public class UserServiceTest {
         when(userRepository.selectAllUsersByTaskId(task.getId())).thenReturn(users);
 
         //when
-        List<UserDTO> actual = userService.getAllUsersByTaskId(task.getId());
+        List<UserDTO> actual = userService.getAllTaskUsersByTaskId(task.getId());
 
         //then
         assertEquals(1, actual.get(0).getId());
@@ -151,7 +151,7 @@ public class UserServiceTest {
         when(userRepository.selectAllUsersByRoleId(role.getId())).thenReturn(users);
 
         //then
-        assertEquals(userDTOS, userService.getAllUsersByRoleId(role.getId()));
+        assertEquals(userDTOS, userService.getAllRoleUsersByRoleId(role.getId()));
         verify(roleRepository).selectById(any());
         verify(userRepository).selectAllUsersByRoleId(role.getId());
     }
@@ -163,7 +163,7 @@ public class UserServiceTest {
         when(roleRepository.selectById(any())).thenReturn(null);
 
         //then
-        assertThrows(CRMProjectServiceException.class, () -> userService.getAllUsersByRoleId(any()));
+        assertThrows(CRMProjectServiceException.class, () -> userService.getAllRoleUsersByRoleId(any()));
         verify(roleRepository).selectById(any());
     }
 

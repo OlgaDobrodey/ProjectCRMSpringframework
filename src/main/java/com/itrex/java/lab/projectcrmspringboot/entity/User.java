@@ -34,9 +34,9 @@ public class User implements Serializable {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "role_id")
-    private Role role;
+        private Role role;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "user_task", schema = "PUBLIC",
             joinColumns = {@JoinColumn(name = "users_id")},

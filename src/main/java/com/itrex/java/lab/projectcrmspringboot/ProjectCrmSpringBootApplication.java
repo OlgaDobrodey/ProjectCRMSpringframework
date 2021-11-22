@@ -14,7 +14,7 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
 
 @Slf4j
 @SpringBootApplication
-@EnableAspectJAutoProxy(proxyTargetClass = true)
+@EnableAspectJAutoProxy(proxyTargetClass = false)
 public class ProjectCrmSpringBootApplication implements CommandLineRunner {
 
     @Autowired
@@ -33,11 +33,15 @@ public class ProjectCrmSpringBootApplication implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         System.out.println("===================START APP======================");
-        System.out.println( userService.getAll());
+        System.out.println(userService.getAll());
         User user1 = userRepository.selectById(1);
         user1.setLogin("111111qwer");
-        System.out.println(userService.getAllUsersByTaskId(1));
+        userService.assignTaskToUser(6, 1);
+        System.out.println();
         System.out.println(userService.getAll());
+        taskService.finishTaskByTaskId(1);
+        System.out.println(taskService.getAll());
+        System.out.println();
         log.info("log info");
         log.debug("log debug");
         log.error("log error");
