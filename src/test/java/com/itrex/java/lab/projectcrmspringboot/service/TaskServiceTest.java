@@ -8,6 +8,7 @@ import com.itrex.java.lab.projectcrmspringboot.exceptions.CRMProjectRepositoryEx
 import com.itrex.java.lab.projectcrmspringboot.exceptions.CRMProjectServiceException;
 import com.itrex.java.lab.projectcrmspringboot.repository.RepositoryTestUtils;
 import com.itrex.java.lab.projectcrmspringboot.repository.TaskRepository;
+import com.itrex.java.lab.projectcrmspringboot.repository.UserRepository;
 import com.itrex.java.lab.projectcrmspringboot.service.impl.TaskServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -34,6 +35,8 @@ public class TaskServiceTest {
     private TaskServiceImpl taskService;
     @Mock
     private TaskRepository taskRepository;
+    @Mock
+    private UserRepository userRepository;
 
     @Test
     public void getAll_returnTaskDTOTest() throws CRMProjectRepositoryException, CRMProjectServiceException {
@@ -194,6 +197,7 @@ public class TaskServiceTest {
         Task task = createTestTasksWithId(1, 1).get(0);
         task.setUsers(List.of(user));
         user.setTasks(new ArrayList<>(List.of(task)));
+       when(userRepository.selectByIdWithAllUserTasks(user.getId())).thenReturn(user);
         when(taskRepository.selectByIdWithAllTaskUsers(task.getId())).thenReturn(task);
 
         //when
@@ -202,6 +206,7 @@ public class TaskServiceTest {
 
         //then
         verify(taskRepository).selectByIdWithAllTaskUsers(task.getId());
+        verify(userRepository).selectByIdWithAllUserTasks(user.getId());
     }
 
     @Test

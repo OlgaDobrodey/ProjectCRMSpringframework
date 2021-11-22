@@ -3,9 +3,11 @@ package com.itrex.java.lab.projectcrmspringboot.service.impl;
 import com.itrex.java.lab.projectcrmspringboot.dto.TaskDTO;
 import com.itrex.java.lab.projectcrmspringboot.entity.Status;
 import com.itrex.java.lab.projectcrmspringboot.entity.Task;
+import com.itrex.java.lab.projectcrmspringboot.entity.User;
 import com.itrex.java.lab.projectcrmspringboot.exceptions.CRMProjectRepositoryException;
 import com.itrex.java.lab.projectcrmspringboot.exceptions.CRMProjectServiceException;
 import com.itrex.java.lab.projectcrmspringboot.repository.TaskRepository;
+import com.itrex.java.lab.projectcrmspringboot.repository.UserRepository;
 import com.itrex.java.lab.projectcrmspringboot.service.TaskService;
 import com.itrex.java.lab.projectcrmspringboot.utils.ConverterUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,12 +23,11 @@ import static com.itrex.java.lab.projectcrmspringboot.utils.ConverterUtils.conve
 @Service
 public class TaskServiceImpl implements TaskService {
 
-    private final TaskRepository taskRepository;
-
     @Autowired
-    public TaskServiceImpl(TaskRepository taskRepository) {
-        this.taskRepository = taskRepository;
-    }
+    private TaskRepository taskRepository;
+    @Autowired
+    private UserRepository userRepository;
+
 
     @Override
     public List<TaskDTO> getAll() throws CRMProjectServiceException {
@@ -101,7 +102,10 @@ public class TaskServiceImpl implements TaskService {
             Task task = taskRepository.selectByIdWithAllTaskUsers(taskId);
             task.setStatus(Status.DONE);
 
-            task.getUsers().forEach(user -> user.getTasks().removeIf(t -> t.getId() == taskId));
+            List<User> users = task.getUsers();
+            for (User user : users) {
+                userRepository.selectByIdWithAllUserTasks(user.getId()).getTasks().removeIf(t -> t.getId() == taskId);
+            }
             taskRepository.update(task);
         } catch (CRMProjectRepositoryException ex) {
             throw new CRMProjectServiceException("ERROR SERVICE: DELETE ALL TASK:", ex);
