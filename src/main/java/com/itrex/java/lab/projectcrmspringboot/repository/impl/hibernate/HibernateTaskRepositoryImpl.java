@@ -16,8 +16,10 @@ import java.util.List;
 public class HibernateTaskRepositoryImpl implements TaskRepository {
 
     private static final String USER_ID = "userId";
+    private static final String TASK_ID = "taskId";
 
-    private static final String SELECT_ALL = "from Task t";
+    private static final String SELECT_ALL = "select t from Task t";
+    private static final String SELECT_TASK_BY_ID_With_USERS = "select t from Task t left join fetch t.users u where t.id = :taskId";
     private static final String SELECT_ALL_TASKS_BY_USER = "select t from User u join u.tasks t where u.id =:userId";
 
     private final SessionFactory sessionFactory;
@@ -42,6 +44,17 @@ public class HibernateTaskRepositoryImpl implements TaskRepository {
             return session.get(Task.class, id);
         } catch (Exception ex) {
             throw new CRMProjectRepositoryException("ERROR: SELECT TASK BY ID: " + ex);
+        }
+    }
+
+    @Override
+    public Task selectByIdWithAllTaskUsers(Integer id) throws CRMProjectRepositoryException {
+        try (Session session = sessionFactory.openSession()) {
+
+            return session.createQuery(SELECT_TASK_BY_ID_With_USERS, Task.class)
+                    .setParameter(TASK_ID,id).getSingleResult();
+        } catch (Exception ex) {
+            throw new CRMProjectRepositoryException("ERROR: SELECT USER BY ID: " + ex);
         }
     }
 

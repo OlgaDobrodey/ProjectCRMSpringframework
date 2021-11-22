@@ -7,9 +7,11 @@ import java.util.List;
 
 public interface UserRepository {
 
+
     List<User> selectAll() throws CRMProjectRepositoryException;
 
     User selectById(Integer id) throws CRMProjectRepositoryException;
+    User selectByIdWithAllUserTasks(Integer id) throws CRMProjectRepositoryException;
 
     List<User> selectAllUsersByTaskId(Integer taskId) throws CRMProjectRepositoryException;
 

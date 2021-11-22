@@ -98,7 +98,7 @@ public class TaskServiceImpl implements TaskService {
     @Transactional
     public void finishTaskByTaskId(Integer taskId) throws CRMProjectServiceException {
         try {
-            Task task = taskRepository.selectById(taskId);
+            Task task = taskRepository.selectByIdWithAllTaskUsers(taskId);
             task.setStatus(Status.DONE);
 
             task.getUsers().forEach(user -> user.getTasks().removeIf(t -> t.getId() == taskId));

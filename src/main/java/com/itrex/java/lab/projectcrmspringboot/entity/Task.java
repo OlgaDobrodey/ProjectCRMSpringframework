@@ -36,7 +36,7 @@ public class Task implements Serializable {
 
     private String info;
 
-    @ManyToMany(mappedBy = "tasks",fetch = FetchType.EAGER)
+    @ManyToMany(mappedBy = "tasks",fetch = FetchType.LAZY)
     private List<User> users;
 
     @Override

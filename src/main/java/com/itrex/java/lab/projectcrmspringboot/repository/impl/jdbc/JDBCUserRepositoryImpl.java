@@ -3,6 +3,7 @@ package com.itrex.java.lab.projectcrmspringboot.repository.impl.jdbc;
 import com.itrex.java.lab.projectcrmspringboot.entity.Role;
 import com.itrex.java.lab.projectcrmspringboot.entity.User;
 import com.itrex.java.lab.projectcrmspringboot.exceptions.CRMProjectRepositoryException;
+import com.itrex.java.lab.projectcrmspringboot.repository.TaskRepository;
 import com.itrex.java.lab.projectcrmspringboot.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -44,6 +45,8 @@ public class JDBCUserRepositoryImpl implements UserRepository {
 
     @Autowired
     private DataSource dataSource;
+    @Autowired
+    private TaskRepository taskRepository;
 
     @Override
     public List<User> selectAll() throws CRMProjectRepositoryException {
@@ -77,6 +80,13 @@ public class JDBCUserRepositoryImpl implements UserRepository {
         } catch (SQLException ex) {
             throw new CRMProjectRepositoryException("ERROR: SELECT USER BY ID: ", ex);
         }
+        return user;
+    }
+
+    @Override
+    public User selectByIdWithAllUserTasks(Integer id) throws CRMProjectRepositoryException {
+        User user= selectById(id);
+        user.setTasks(taskRepository.selectAllTasksByUserId(id));
         return user;
     }
 

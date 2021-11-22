@@ -17,7 +17,9 @@ public class HibernateUserRepositoryImpl implements UserRepository {
 
     private static final String TASK_ID = "taskId";
     private static final String ROLE_ID = "roleId";
+    private static final String USER_ID = "userId";
     private static final String SELECT_ALL = "select u from User u";
+    private static final String SELECT_USER_BY_ID_With_TASKS = "select u from User u left join fetch u.tasks t where u.id = :userId";
     private static final String SELECT_ALL_USERS_BY_TASK = "select u from Task t join t.users u where t.id =:taskId";
     private static final String SELECT_ALL_USERS_BY_ROLE = "select u from Role r join r.users u where r.id =:roleId";
 
@@ -41,6 +43,17 @@ public class HibernateUserRepositoryImpl implements UserRepository {
         try (Session session = sessionFactory.openSession()) {
 
             return session.get(User.class, id);
+        } catch (Exception ex) {
+            throw new CRMProjectRepositoryException("ERROR: SELECT USER BY ID: " + ex);
+        }
+    }
+
+    @Override
+    public User selectByIdWithAllUserTasks(Integer id) throws CRMProjectRepositoryException {
+        try (Session session = sessionFactory.openSession()) {
+
+            return session.createQuery(SELECT_USER_BY_ID_With_TASKS, User.class)
+                    .setParameter(USER_ID,id).getSingleResult();
         } catch (Exception ex) {
             throw new CRMProjectRepositoryException("ERROR: SELECT USER BY ID: " + ex);
         }

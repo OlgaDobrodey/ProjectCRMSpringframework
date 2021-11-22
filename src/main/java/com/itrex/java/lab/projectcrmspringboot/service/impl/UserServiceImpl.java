@@ -111,7 +111,7 @@ public class UserServiceImpl implements UserService {
     public void assignTaskToUser(Integer taskId, Integer userId) throws CRMProjectServiceException {
         try {
             Task task = taskRepository.selectById(taskId);
-            User user = userRepository.selectById(userId);
+            User user = userRepository.selectByIdWithAllUserTasks(userId);
             user.getTasks().add(task);
             userRepository.update(user);
         } catch (CRMProjectRepositoryException ex) {
@@ -185,13 +185,13 @@ public class UserServiceImpl implements UserService {
                 throw new CRMProjectServiceException("ERROR SERVICE: DELETE TASK BY USER: task == null");
             }
 
-            List<User> users = task.getUsers();
+            List<User> users = userRepository.selectAllUsersByTaskId(taskId);
             if (users.size() == 1) {
-                if (users.get(0).getTasks().get(0).getId().equals(taskId))
-                    task.setStatus(Status.DONE);
+                task.setStatus(Status.DONE);
+                taskRepository.update(task);
             }
 
-            User user = userRepository.selectById(userId);
+            User user = userRepository.selectByIdWithAllUserTasks(userId);
             if (user == null) {
                 throw new CRMProjectServiceException("ERROR SERVICE: DELETE TASK BY USER: user == null");
             }
@@ -206,7 +206,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void revokeAllUserTasksByUserId(Integer userId) throws CRMProjectServiceException {
         try {
-            User user = userRepository.selectById(userId);
+            User user = userRepository.selectByIdWithAllUserTasks(userId);
             user.setTasks(new ArrayList<>());
             userRepository.update(user);
         } catch (CRMProjectRepositoryException ex) {

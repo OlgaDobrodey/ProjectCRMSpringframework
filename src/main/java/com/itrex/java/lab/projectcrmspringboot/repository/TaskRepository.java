@@ -10,6 +10,7 @@ public interface TaskRepository {
     List<Task> selectAll() throws CRMProjectRepositoryException;
 
     Task selectById(Integer id) throws CRMProjectRepositoryException;
+    Task selectByIdWithAllTaskUsers(Integer id) throws CRMProjectRepositoryException;
 
     List<Task> selectAllTasksByUserId(Integer idUser) throws CRMProjectRepositoryException;
 

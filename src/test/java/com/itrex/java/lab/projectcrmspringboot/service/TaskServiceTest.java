@@ -194,14 +194,14 @@ public class TaskServiceTest {
         Task task = createTestTasksWithId(1, 1).get(0);
         task.setUsers(List.of(user));
         user.setTasks(new ArrayList<>(List.of(task)));
-        when(taskRepository.selectById(task.getId())).thenReturn(task);
+        when(taskRepository.selectByIdWithAllTaskUsers(task.getId())).thenReturn(task);
 
         //when
         taskService.finishTaskByTaskId(task.getId());
         assertEquals(Status.DONE, task.getStatus());
 
         //then
-        verify(taskRepository).selectById(task.getId());
+        verify(taskRepository).selectByIdWithAllTaskUsers(task.getId());
     }
 
     @Test

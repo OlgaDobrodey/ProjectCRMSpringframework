@@ -101,6 +101,27 @@ public abstract class AbstractUserRepositoryTest extends BaseRepositoryTest {
     }
 
     @Test
+    void selectByIdWithAllUserTasks_existUserId_returnUser() throws CRMProjectRepositoryException {
+        //given
+        Integer userId = 2;
+
+        //when
+        User user = repository.selectByIdWithAllUserTasks(userId);
+
+        //then
+        assertEquals(user.getTasks().size(),3);
+    }
+
+    @Test
+    void selectByIdWithAllUserTasks_existUserIdnoBD_shouldException () throws CRMProjectRepositoryException {
+        //given && when
+        Integer userId = 12;
+
+        //then
+        assertThrows(Exception.class,()->repository.selectByIdWithAllUserTasks(userId));;
+    }
+
+    @Test
     void add_validData_existUser_returnUserTest() throws CRMProjectRepositoryException {
         //given
         User user = RepositoryTestUtils.createTestUsers(1).get(0);

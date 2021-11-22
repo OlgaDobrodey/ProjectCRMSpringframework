@@ -233,14 +233,14 @@ public class UserServiceTest {
         User user = createTestUsersWithId(1, 1).get(0);
         Task task = createTestTasksWithId(1, 1).get(0);
         user.setTasks(new ArrayList<>());
-        when(userRepository.selectById(user.getId())).thenReturn(user);
+        when(userRepository.selectByIdWithAllUserTasks(user.getId())).thenReturn(user);
         when(taskRepository.selectById(task.getId())).thenReturn(task);
 
         //when
         userService.assignTaskToUser(task.getId(), user.getId());
 
         //then
-        verify(userRepository).selectById(any());
+        verify(userRepository).selectByIdWithAllUserTasks(any());
         verify(taskRepository).selectById(any());
     }
 
@@ -291,7 +291,8 @@ public class UserServiceTest {
         User user = createTestUsersWithId(1, 1).get(0);
         user.setTasks(new ArrayList<>(List.of(task)));
         task.setUsers(new ArrayList<>(List.of(user)));
-        when(userRepository.selectById(user.getId())).thenReturn(user);
+        when(userRepository.selectByIdWithAllUserTasks(user.getId())).thenReturn(user);
+        when(userRepository.selectAllUsersByTaskId(task.getId())).thenReturn(new ArrayList<>(List.of(user)));
         when(taskRepository.selectById(task.getId())).thenReturn(task);
 
         // when
@@ -299,8 +300,9 @@ public class UserServiceTest {
 
         //then
         assertEquals(Status.DONE, task.getStatus());
-        verify(userRepository).selectById(user.getId());
+        verify(userRepository).selectByIdWithAllUserTasks(user.getId());
         verify(taskRepository).selectById(task.getId());
+        verify(userRepository).selectAllUsersByTaskId(any());
     }
 
     @Test
@@ -311,16 +313,20 @@ public class UserServiceTest {
         List<User> users = createTestUsersWithId(1, 3);
         users.forEach(u -> u.setTasks(new ArrayList<>(List.of(task))));
         task.setUsers(users);
-        when(userRepository.selectById(users.get(0).getId())).thenReturn(users.get(0));
+        when(userRepository.selectByIdWithAllUserTasks(users.get(0).getId())).thenReturn(users.get(0));
+        when(userRepository.selectAllUsersByTaskId(task.getId())).thenReturn(users);
         when(taskRepository.selectById(task.getId())).thenReturn(task);
+
+        // when
 
         // when
         userService.revokeTaskFromUser(task.getId(), users.get(0).getId());
 
         //then
         assertEquals(Status.NEW, task.getStatus());
-        verify(userRepository).selectById(users.get(0).getId());
+        verify(userRepository).selectByIdWithAllUserTasks(users.get(0).getId());
         verify(taskRepository).selectById(task.getId());
+        verify(userRepository).selectAllUsersByTaskId(any());
     }
 
     @Test
@@ -355,13 +361,13 @@ public class UserServiceTest {
     void revokeAllUserTasksByUserId_existIdUserTest() throws CRMProjectRepositoryException, CRMProjectServiceException {
         //given
         User user = createTestUsersWithId(1, 2).get(0);
-        when(userRepository.selectById(user.getId())).thenReturn(user);
+        when(userRepository.selectByIdWithAllUserTasks(user.getId())).thenReturn(user);
 
         //when
         userService.revokeAllUserTasksByUserId(2);
 
         //then
-        verify(userRepository).selectById(any());
+        verify(userRepository).selectByIdWithAllUserTasks(any());
     }
 
     @Test

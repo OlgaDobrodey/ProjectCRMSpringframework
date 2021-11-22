@@ -69,6 +69,27 @@ public abstract class AbstractTaskRepositoryTest extends BaseRepositoryTest {
     }
 
     @Test
+    void selectByIdWithAllTaskUsers_existTaskId_returnUser() throws CRMProjectRepositoryException {
+        //given
+        Integer taskId = 2;
+
+        //when
+        Task task = repository.selectByIdWithAllTaskUsers(taskId);
+
+        //then
+        assertEquals(task.getUsers().size(),2);
+    }
+
+    @Test
+    void selectByIdWithAllTaskUsers_existTaskIdnoBD_shouldException () throws CRMProjectRepositoryException {
+        //given && when
+        Integer taskId = 22;
+
+        //then
+        assertThrows(Exception.class,()->repository.selectByIdWithAllTaskUsers(taskId));;
+    }
+
+    @Test
     void selectById_returnThrowRepositoryExceptionTest() {
         //given && when
         cleanDB();    //clean Data Base

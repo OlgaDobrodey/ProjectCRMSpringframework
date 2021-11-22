@@ -4,6 +4,7 @@ import com.itrex.java.lab.projectcrmspringboot.entity.Status;
 import com.itrex.java.lab.projectcrmspringboot.entity.Task;
 import com.itrex.java.lab.projectcrmspringboot.exceptions.CRMProjectRepositoryException;
 import com.itrex.java.lab.projectcrmspringboot.repository.TaskRepository;
+import com.itrex.java.lab.projectcrmspringboot.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
@@ -32,12 +33,10 @@ public class JDBCTaskRepositoryImpl implements TaskRepository {
     private static final String UPDATE_TASK_QUERY = "UPDATE task SET title=?, status=?, deadline=?, info=?  WHERE id = ?";
     private static final String DELETE_TASK_QUERTY = "DELETE FROM task WHERE id = ?";
 
-    private DataSource dataSource;
-
     @Autowired
-    public JDBCTaskRepositoryImpl(DataSource dataSource) {
-        this.dataSource = dataSource;
-    }
+    private DataSource dataSource;
+    @Autowired
+    private UserRepository userRepository;
 
     @Override
     public List<Task> selectAll() throws CRMProjectRepositoryException {
@@ -71,6 +70,13 @@ public class JDBCTaskRepositoryImpl implements TaskRepository {
         } catch (SQLException ex) {
             throw new CRMProjectRepositoryException("ERROR: SELECT TASK BY ID: " + ex);
         }
+        return task;
+    }
+
+    @Override
+    public Task selectByIdWithAllTaskUsers(Integer id) throws CRMProjectRepositoryException {
+        Task task = selectById(id);
+        task.setUsers(userRepository.selectAllUsersByTaskId(id));
         return task;
     }
 
