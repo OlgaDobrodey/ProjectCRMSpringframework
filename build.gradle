@@ -1,17 +1,18 @@
 plugins {
-    id 'org.springframework.boot' version '2.5.6'
-    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
     id 'java'
+    id 'application'
+    id 'jacoco'
 }
 
-group = 'com.itrex.java.lab'
-version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '11'
+group 'com.itrex.java.lab'
+version '1.0-SNAPSHOT'
 
-configurations {
-    compileOnly {
-        extendsFrom annotationProcessor
-    }
+ext {
+    javaMainClass = "com.itrex.java.lab.Runner"
+}
+
+application {
+    mainClassName = javaMainClass
 }
 
 repositories {
@@ -19,24 +20,25 @@ repositories {
 }
 
 dependencies {
-    implementation ('org.springframework.boot:spring-boot-starter-data-jpa') {
-        exclude module: 'spring-boot-starter-logging'
+    implementation group: 'com.h2database', name: 'h2', version: '1.4.200'
+    implementation group: 'org.flywaydb', name: 'flyway-core', version: '8.0.0'
+    implementation group: 'org.hibernate', name: 'hibernate-core', version: '5.6.0.Final'
+
+    implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.32'
+    implementation group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.7.32'
+
+    implementation (group: 'org.springframework', name: 'spring-context', version: '5.3.11') {
+        exclude module: 'commons-logging'
     }
-    implementation ('org.springframework.boot:spring-boot-starter-jdbc') {
-        exclude module: 'spring-boot-starter-logging'
-    }
+    implementation group: 'org.springframework', name: 'spring-core', version: '5.3.11'
+    implementation group: 'org.springframework', name: 'spring-orm', version: '5.3.11'
 
-    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    implementation group: 'org.springframework', name: 'spring-aspects', version: '5.3.11'
+    implementation group: 'org.springframework', name: 'spring-aop', version: '5.3.11'
 
-    implementation 'com.h2database:h2'
-    implementation 'org.flywaydb:flyway-core'
+    implementation group: 'com.mchange', name: 'c3p0', version: '0.9.5.5'
 
-    compileOnly 'org.projectlombok:lombok'
-    annotationProcessor 'org.projectlombok:lombok'
-
-    testImplementation ('org.springframework.boot:spring-boot-starter-test') {
-        exclude module: 'spring-boot-starter-logging'
-    }
+    testImplementation group: 'org.springframework', name: 'spring-test', version: '5.3.11'
 
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
@@ -44,9 +46,12 @@ dependencies {
     testImplementation 'org.mockito:mockito-junit-jupiter:3.12.4'
     testImplementation 'org.mockito:mockito-core:3.12.4'
 
-    implementation 'org.springframework.boot:spring-boot-starter-log4j2'
+    compileOnly 'org.projectlombok:lombok:1.18.22'
+    annotationProcessor 'org.projectlombok:lombok:1.18.22'
 }
+
 
 test {
     useJUnitPlatform()
 }
+
